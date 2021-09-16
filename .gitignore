@@ -1,3 +1,7 @@
+# Local files
+entries.db
+config.source
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
