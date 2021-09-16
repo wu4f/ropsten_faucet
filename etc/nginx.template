@@ -1,0 +1,15 @@
+server {
+    listen 80;
+    server_tokens off;
+    server_name PROJECT_HOST;
+    root PROJECT_DIR;
+
+    location / {
+         include proxy_params;
+         proxy_pass http://unix:PROJECT_DIR/gunicorn.sock;
+     }
+
+     location /static {
+         alias PROJECT_DIR/static;
+     }
+}
