@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block content %}
+    {% if email and not wait %}
+    Enter your Ethereum Address:
+    <form action="{{ url_for('eth') }}" method=post>
+	<input type="text" name="address" size="50">
+	<input type=submit value="Get ETH">
+    </form>
+    {% elif email %}
+    Faucet is limited to one request per day per e-mail address.  ETH is not sent to addresses with large balances.<br><br>
+    {% else %}
+    Requires a Google login session
+    {% endif %}
+    {% if tx_hash %}
+    Transaction hash is: <a href="https://ropsten.etherscan.io/tx/{{tx_hash}}">{{tx_hash}}</a><br>
+    {% endif %}
+{% endblock %}

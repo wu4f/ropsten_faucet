@@ -1,15 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-    {% if wait %}
-    Faucet is limited to those who really need it<br>
-    {% else %}
-    Enter your Ethereum Address:
-    <form action="{{ url_for('index') }}" method=post>
-	<input type="text" name="address" size="50">
-	<input type=submit value="Get ETH">
-    </form>
-    {% endif %}
-    {% if tx_hash %}
-    Transaction hash is: <a href="https://ropsten.etherscan.io/tx/{{tx_hash}}">{{tx_hash}}</a><br>
-    {% endif %}
+This faucet gives out 5 ETH at a time to addresses with limited balances on the Ropsten Ethereum test network.  It is open to anyone with a Google sign-on (including all Portland State University students with a pdx.edu address taking the Blockchain <a href="https://thefengs.com/wuchang/courses/cs410b">course</a>).  Only one request per e-mail address per day is allowed.
+
+<h3>To get Ropsten testnet ETH, click <a href="{{ url_for('eth') }}">here</a></h3>
 {% endblock %}

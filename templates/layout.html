@@ -1,10 +1,15 @@
 <!doctype html>
 <html>
-<title>My Ropsten Faucet</title>
+<title>Ropsten Faucet</title>
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
 <section>
         <div id="content" class=page>
-                {% block content %} {% endblock %}
+	<h1>Ropsten faucet</h1>
+	{% if email %}
+	Logged in as {{email}}: <a href="{{ url_for('logout') }}">Logout</a><br><br>
+	{% endif %}
+        {% block content %}
+	{% endblock %}
         </div>
 </section>
 </html>
