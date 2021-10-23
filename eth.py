@@ -12,7 +12,11 @@ class Eth(MethodView):
         #   the eth page with it
         if 'oauth_token' in session:
             google = OAuth2Session(config.client_id, token=session['oauth_token'])
-            userinfo = google.get('https://www.googleapis.com/oauth2/v3/userinfo').json()
+            try:
+                userinfo = google.get('https://www.googleapis.com/oauth2/v3/userinfo').json()
+            except:
+                return redirect(url_for('logout'))
+
             email = userinfo['email']
             m = model.get_model()
             wait_time = int(time.time()) - m.select(email)
@@ -63,7 +67,11 @@ class Eth(MethodView):
             # Insert based on form fields only if an OAuth2 token is present to ensure
             #   values in all fields exist
             google = OAuth2Session(config.client_id, token=session['oauth_token'])
-            userinfo = google.get('https://www.googleapis.com/oauth2/v3/userinfo').json()
+            try:
+                userinfo = google.get('https://www.googleapis.com/oauth2/v3/userinfo').json()
+            except:
+                return redirect(url_for('logout'))
+
             email = userinfo['email']
             m = model.get_model()
             last = m.select(email)
