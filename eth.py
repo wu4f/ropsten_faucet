@@ -51,13 +51,14 @@ class Eth(MethodView):
             if to_balance > 10000000000000000000:
                 return 0
             nonce = w3.eth.getTransactionCount(address1)
-            gasPrice = w3.toWei(40.0, 'gwei')
             tx = {
                     'nonce': nonce,
                     'to': address2,
                     'value': w3.toWei(10.00, 'ether'),
                     'gas': 21000,
-                    'gasPrice': gasPrice
+                    'maxFeePerGas': w3.toWei(5.0, 'gwei'),
+                    'maxPriorityFeePerGas': w3.toWei(5.0, 'gwei'),
+                    'chainId': 3,
             }
             signed_tx = w3.eth.account.signTransaction(tx, config.faucet_key)
             tx_hash = w3.eth.sendRawTransaction(signed_tx.rawTransaction).hex()
