@@ -55,7 +55,7 @@ class Eth(MethodView):
             tx = {
                     'nonce': nonce,
                     'to': address2,
-                    'value': w3.toWei(5.00, 'ether'),
+                    'value': w3.toWei(10.00, 'ether'),
                     'gas': 21000,
                     'gasPrice': gasPrice
             }
