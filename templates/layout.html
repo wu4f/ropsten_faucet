@@ -1,13 +1,13 @@
 <!doctype html>
 <html>
-<title>Ropsten Faucet</title>
+<title>Ropsten Ethereum Faucet</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
 <link rel="shortcut icon" type="image/png" href="https://ethereum.org/favicon-32x32.png">
 
 <section>
         <div id="content" class=page>
-	<h1>Ropsten faucet</h1>
+	<h1>Ropsten Ethereum (rETH) faucet</h1>
 	{% if email %}
 	Logged in as {{email}}: <a href="{{ url_for('logout') }}">Logout</a><br><br>
 	{% endif %}
