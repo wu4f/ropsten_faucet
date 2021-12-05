@@ -29,7 +29,7 @@ class model(Model):
 
     def select(self, email):
         """
-        Gets all rows from the database
+        Gets row from the database
         Each row contains: email, last
         :return: 0 if not in database, last value otherwise
         """
@@ -42,6 +42,18 @@ class model(Model):
         else:
             last = 0
         return last
+
+    def select_all(self):
+        """
+        Gets all rows from the database
+        Each row contains: email, last
+        :return: 0 if not in database, last value otherwise
+        """
+        connection = sqlite3.connect(DB_FILE)
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM users ORDER BY last DESC LIMIT 50")
+        res = cursor.fetchall()
+        return res
 
     def insert(self, email):
         """
