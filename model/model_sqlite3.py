@@ -27,17 +27,16 @@ class model(Model):
             cursor.execute("create table users (email text, ip text, wallet text, last integer)")
         cursor.close()
 
-    def select(self, email):
+    def select(self, email, ip, wallet):
         """
-        Gets row from the database
-        Each row contains: email, last
-        :return: 0 if not in database, last value otherwise
+        Returns the most recent timestamp the email or ip address got ETH
+        :return: 0 if neither email nor ip in database, last value otherwise
         """
         connection = sqlite3.connect(DB_FILE)
         cursor = connection.cursor()
-        cursor.execute("SELECT last FROM users WHERE email=?", (email,))
+        cursor.execute("SELECT last FROM users WHERE email=? or ip=? or wallet=? ORDER BY last DESC LIMIT 1", (email,ip,wallet))
         res = cursor.fetchall()
-        if res:
+        if len(res) > 0:
             last = res.pop()[0]
         else:
             last = 0

@@ -1,7 +1,10 @@
 class Model():
-    def select(self, email):
+    def select(self, email, ip, wallet):
         """
-        Gets last time ETH received
+        Gets last time ETH received for email, ip, or wallet
+        :param email: String
+        :param ip: String
+        :param wallet: String
         :return: Integer seconds
         """
         pass

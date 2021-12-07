@@ -18,9 +18,13 @@ class Eth(MethodView):
                 return redirect(url_for('logout'))
 
             email = userinfo['email']
+            if request.headers.getlist("X-Forwarded-For"):
+                ip = request.headers.getlist("X-Forwarded-For")[0]
+            else:
+                ip = request.remote_addr
             m = model.get_model()
-            wait_time = int(time.time()) - m.select(email)
-            if wait_time < 86400:
+            wait_time = int(time.time()) - m.select(email, ip, "y")
+            if wait_time < 604800:
                 return render_template('eth.html', email=userinfo['email'], wait=wait_time)
             else:
                 return render_template('eth.html', email=userinfo['email'])
@@ -80,7 +84,7 @@ class Eth(MethodView):
                 ip = request.remote_addr
             wallet = request.form['address']
             m = model.get_model()
-            last = m.select(email)
+            last = m.select(email,ip,wallet)
             if last == 0:
                 m.insert(email, ip, wallet)
                 tx_hash = send_eth(wallet)
@@ -90,6 +94,6 @@ class Eth(MethodView):
                 tx_hash = send_eth(wallet)
                 return render_template('eth.html', email=userinfo['email'], tx_hash=tx_hash, wait=1)
             else:
-                return redirect(url_for('eth'))
+                return render_template('eth.html', email=userinfo['email'], wait=1)
         else:
             return redirect(url_for('eth'))

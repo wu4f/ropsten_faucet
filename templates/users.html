@@ -1,0 +1,7 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h3>Users</h3>
+    {% for user in users %}
+    {{ user.name }} at {{user.ip}} sent to {{user.wallet}} on {{ user.last }}<br>
+    {% endfor %}
+{% endblock %}
