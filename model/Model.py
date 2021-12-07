@@ -6,18 +6,22 @@ class Model():
         """
         pass
 
-    def insert(self, email):
+    def insert(self, email, ip, wallet):
         """
         Inserts entry into database
         :param email: String
+        :param ip: String
+        :param wallet: String
         :return: none
         """
         pass
 
-    def update(self, email):
+    def update(self, email, ip, wallet):
         """
         Updates entry in database
         :param email: String
+        :param ip: String
+        :param wallet: String
         :return: none
         """
         pass

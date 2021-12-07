@@ -1,14 +1,14 @@
 """
 Per-user faucet access to rate limit requests
-+------------------+------------+
-| Email            | last       |
-+==================+============+
-| jdoe@example.com | 123456789  |
-+------------------+------------+
++------------------+----------------+-------------+-----------+
+| Email            | ip             | wallet      | last      |
++==================+================+=============+===========+
+| jdoe@example.com | 131.252.220.66 | 0xAbC123... | 123456789 |
++------------------+----------------+-------------+-----------+
 
 This can be created with the following SQL (see bottom of this file):
 
-    create table users (email text, last integer);
+    create table users (email text, ip text, wallet text, last integer)
 
 """
 import time
@@ -24,7 +24,7 @@ class model(Model):
         try:
             cursor.execute("select count(rowid) from users")
         except sqlite3.OperationalError:
-            cursor.execute("create table users (email text, last integer)")
+            cursor.execute("create table users (email text, ip text, wallet text, last integer)")
         cursor.close()
 
     def select(self, email):
@@ -55,34 +55,36 @@ class model(Model):
         res = cursor.fetchall()
         return res
 
-    def insert(self, email):
+    def insert(self, email, ip, wallet):
         """
         Inserts entry into database
         :param email: String
+        :param ip: String
+        :param wallet: String
         :return: True
         :raises: Database errors on connection and insertion
         """
         last = int(time.time())
         connection = sqlite3.connect(DB_FILE)
         cursor = connection.cursor()
-        cursor.execute("insert into users VALUES (?,?)", (email,last))
-        #cursor.execute("insert into users (email, last) VALUES (:email, :last)", params)
+        cursor.execute("insert into users VALUES (?,?,?,?)", (email,ip,wallet,last))
         connection.commit()
         cursor.close()
         return True
 
-    def update(self, email):
+    def update(self, email, ip, wallet):
         """
         Updates entry in database
         :param email: String
+        :param ip: String
+        :param wallet: String
         :return: True
         :raises: Database errors on connection and insertion
         """
         last = int(time.time())
-        params = {'email':email, 'last':last}
         connection = sqlite3.connect(DB_FILE)
         cursor = connection.cursor()
-        cursor.execute("update users set last=? where email=?",(last, email))
+        cursor.execute("update users set ip=?, wallet=?, last=? where email=?",(ip, wallet, last, email))
         connection.commit()
         cursor.close()
         return True
