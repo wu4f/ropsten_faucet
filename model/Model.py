@@ -8,6 +8,14 @@ class Model():
         :return: Integer seconds
         """
         pass
+    
+    def select_all(self):
+        """
+        Gets all rows from the database
+        Each row contains: email, last
+        :return: 0 if not in database, last value otherwise
+        """
+        pass
 
     def insert(self, email, ip, wallet):
         """
