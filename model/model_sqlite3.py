@@ -29,8 +29,8 @@ class model(Model):
 
     def select(self, email, ip, wallet):
         """
-        Returns the most recent timestamp the email or ip address got ETH
-        :return: 0 if neither email nor ip in database, last value otherwise
+        Returns the most recent timestamp the email, ip, or wallet address got ETH
+        :return: 0 if email, ip, or wallet is in database, last value otherwise
         """
         connection = sqlite3.connect(DB_FILE)
         cursor = connection.cursor()
