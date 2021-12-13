@@ -1,4 +1,4 @@
-from flask import render_template, session, redirect
+from flask import render_template, session, redirect, url_for
 from requests_oauthlib import OAuth2Session
 from flask.views import MethodView
 import model

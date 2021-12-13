@@ -60,8 +60,8 @@ class Eth(MethodView):
                     'to': address2,
                     'value': w3.toWei(10.00, 'ether'),
                     'gas': 21000,
-                    'maxFeePerGas': w3.toWei(5.0, 'gwei'),
-                    'maxPriorityFeePerGas': w3.toWei(5.0, 'gwei'),
+                    'maxFeePerGas': w3.toWei(50.0, 'gwei'),
+                    'maxPriorityFeePerGas': w3.toWei(10.0, 'gwei'),
                     'chainId': 3,
             }
             signed_tx = w3.eth.account.signTransaction(tx, config.faucet_key)
