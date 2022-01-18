@@ -50,7 +50,7 @@ class model(Model):
         """
         connection = sqlite3.connect(DB_FILE)
         cursor = connection.cursor()
-        cursor.execute("SELECT * FROM users ORDER BY last DESC LIMIT 50")
+        cursor.execute("SELECT * FROM users ORDER BY last DESC LIMIT 100")
         res = cursor.fetchall()
         return res
 
