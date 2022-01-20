@@ -24,7 +24,7 @@ class Eth(MethodView):
                 ip = request.remote_addr
             m = model.get_model()
             wait_time = int(time.time()) - m.select(email, ip, "y")
-            if wait_time < 604800:
+            if wait_time < 86400:
                 return render_template('eth.html', email=userinfo['email'], wait=wait_time)
             else:
                 return render_template('eth.html', email=userinfo['email'])
@@ -47,7 +47,7 @@ class Eth(MethodView):
         Accepts POST requests, and processes the form;
         Redirect to index when completed.
         """
-        def send_eth(to_address):
+        def send_eth(to_address, send_amount):
             w3 = Web3(Web3.HTTPProvider(config.node_url))
             address1 = Web3.toChecksumAddress(config.faucet_address)
             address2 = Web3.toChecksumAddress(to_address)
@@ -58,7 +58,7 @@ class Eth(MethodView):
             tx = {
                     'nonce': nonce,
                     'to': address2,
-                    'value': w3.toWei(10.00, 'ether'),
+                    'value': w3.toWei(send_amount, 'ether'),
                     'gas': 21000,
                     'maxFeePerGas': w3.toWei(1000.0, 'gwei'),
                     'maxPriorityFeePerGas': w3.toWei(500.0, 'gwei'),
@@ -78,6 +78,12 @@ class Eth(MethodView):
                 return redirect(url_for('logout'))
 
             email = userinfo['email']
+
+            if '@pdx.edu' in email:
+                send_amount = 10.0
+            else:
+                send_amount = 1.0
+
             if request.headers.getlist("X-Forwarded-For"):
                 ip = request.headers.getlist("X-Forwarded-For")[0]
             else:
@@ -87,11 +93,11 @@ class Eth(MethodView):
             last = m.select(email,ip,wallet)
             if last == 0:
                 m.insert(email, ip, wallet)
-                tx_hash = send_eth(wallet)
+                tx_hash = send_eth(wallet, send_amount)
                 return render_template('eth.html', email=userinfo['email'], tx_hash=tx_hash, wait=1)
             elif int(time.time()) - last > 604800:
                 m.update(email, ip, wallet)
-                tx_hash = send_eth(wallet)
+                tx_hash = send_eth(wallet, send_amount)
                 return render_template('eth.html', email=userinfo['email'], tx_hash=tx_hash, wait=1)
             else:
                 return render_template('eth.html', email=userinfo['email'], wait=1)

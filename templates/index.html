@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
-This faucet gives out 10 ETH at a time to addresses with limited balances on the Ropsten Ethereum test network.  It is open to anyone with a Google sign-on (including all Portland State University students with a pdx.edu address taking the Blockchain <a href="https://thefengs.com/wuchang/courses/cs410b">course</a>).
+This faucet gives out 10 ETH at a time to Portland State University students taking the Blockchain <a href="https://thefengs.com/wuchang/courses/cs410b">course</a> and 1 ETH at a time to all other addresses.
+It requires a Google sign-on to access and is rate-limited.
 
 <h3>To get Ropsten testnet ETH, click <a href="{{ url_for('eth') }}">here</a></h3>
 {% endblock %}
