@@ -5,6 +5,7 @@ import flask
 import os
 from index import Index
 from eth import Eth
+from users import Users
 from callback import Callback
 from logout import Logout
 
@@ -25,6 +26,10 @@ app.add_url_rule('/eth',
 
 app.add_url_rule('/logout',
                  view_func=Logout.as_view('logout'),
+                 methods=["GET"])
+
+app.add_url_rule('/users',
+                 view_func=Users.as_view('users'),
                  methods=["GET"])
 
 if __name__ == '__main__':
