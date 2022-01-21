@@ -24,7 +24,7 @@ class Eth(MethodView):
                 ip = request.remote_addr
             m = model.get_model()
             wait_time = int(time.time()) - m.select(email, ip, "y")
-            if wait_time < 86400:
+            if wait_time < 1209600:
                 return render_template('eth.html', email=userinfo['email'], wait=wait_time)
             else:
                 return render_template('eth.html', email=userinfo['email'])
@@ -82,7 +82,7 @@ class Eth(MethodView):
             if '@pdx.edu' in email:
                 send_amount = 10.0
             else:
-                send_amount = 1.0
+                send_amount = 5.0
 
             if request.headers.getlist("X-Forwarded-For"):
                 ip = request.headers.getlist("X-Forwarded-For")[0]
@@ -95,7 +95,7 @@ class Eth(MethodView):
                 m.insert(email, ip, wallet)
                 tx_hash = send_eth(wallet, send_amount)
                 return render_template('eth.html', email=userinfo['email'], tx_hash=tx_hash, wait=1)
-            elif int(time.time()) - last > 604800:
+            elif int(time.time()) - last > 1209600:
                 m.update(email, ip, wallet)
                 tx_hash = send_eth(wallet, send_amount)
                 return render_template('eth.html', email=userinfo['email'], tx_hash=tx_hash, wait=1)
