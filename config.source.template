@@ -4,3 +4,4 @@ export CLIENT_SECRET=abcABC012defDEF345ghiGHI
 export FAUCET_ADDRESS=0x00112233445566778899aAbBcCdDeEfF00112233
 export FAUCET_KEY=0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
 export CALLBACK_URL=http://aaa.bbb.ccc/callback
+export LOGFILE='path/to/log.txt'
