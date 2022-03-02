@@ -5,6 +5,8 @@ from flask.views import MethodView
 import model
 import config
 import time
+import logging
+from datetime import datetime, timezone, timedelta
 
 class Eth(MethodView):
     def get(self):
@@ -53,6 +55,8 @@ class Eth(MethodView):
             address2 = Web3.toChecksumAddress(to_address)
             to_balance = w3.eth.get_balance(address2)
             if to_balance > 10000000000000000000:
+                now = datetime.now().astimezone(timezone(timedelta(hours=-8))).strftime('%m-%d %H:%M')
+                logging.info(f'{now}:High Balance:{to_address}')
                 return 0
             nonce = w3.eth.getTransactionCount(address1)
             tx = {
@@ -65,7 +69,12 @@ class Eth(MethodView):
                     'chainId': 3,
             }
             signed_tx = w3.eth.account.signTransaction(tx, config.faucet_key)
-            tx_hash = w3.eth.sendRawTransaction(signed_tx.rawTransaction).hex()
+            try:
+                tx_hash = w3.eth.sendRawTransaction(signed_tx.rawTransaction).hex()
+            except:
+                now = datetime.now().astimezone(timezone(timedelta(hours=-8))).strftime('%m-%d %H:%M')
+                logging.info(f'{now}:Failed Transaction: {to_address}')
+                tx_hash = 0
             return tx_hash
 
         if ('oauth_token' in session) and ('address' in request.form) and Web3.isAddress(request.form['address']):
@@ -88,7 +97,9 @@ class Eth(MethodView):
                 ip = request.headers.getlist("X-Forwarded-For")[0]
             else:
                 ip = request.remote_addr
+
             wallet = request.form['address']
+
             m = model.get_model()
             last = m.select(email,ip,wallet)
             if last == 0:
@@ -100,6 +111,8 @@ class Eth(MethodView):
                 tx_hash = send_eth(wallet, send_amount)
                 return render_template('eth.html', email=userinfo['email'], tx_hash=tx_hash, wait=1)
             else:
+                now = datetime.now().astimezone(timezone(timedelta(hours=-8))).strftime('%m-%d %H:%M')
+                logging.info(f'{now}:Rate Limit:{email}:{ip}:{wallet}')
                 return render_template('eth.html', email=userinfo['email'], wait=1)
         else:
             return redirect(url_for('eth'))
