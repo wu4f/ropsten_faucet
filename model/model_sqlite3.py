@@ -42,7 +42,7 @@ class model(Model):
             last = 0
         return last
 
-    def select_all(self):
+    def select_all(self, sort):
         """
         Gets all rows from the database
         Each row contains: email, last
@@ -50,7 +50,11 @@ class model(Model):
         """
         connection = sqlite3.connect(DB_FILE)
         cursor = connection.cursor()
-        cursor.execute("SELECT * FROM users ORDER BY last DESC LIMIT 100")
+        #cursor.execute("SELECT email,ip,wallet,last FROM users ORDER BY last DESC LIMIT 200")
+        if (sort == "ip"):
+            cursor.execute("SELECT s.* FROM (SELECT email,ip,wallet,last FROM users ORDER BY last DESC LIMIT 300) s ORDER BY s.ip ASC")
+        else:
+            cursor.execute("SELECT email,ip,wallet,last FROM users ORDER BY last DESC LIMIT 300")
         res = cursor.fetchall()
         return res
 
