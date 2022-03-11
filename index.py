@@ -10,10 +10,11 @@ class Index(MethodView):
             google = OAuth2Session(config.client_id, token=session['oauth_token'])
             try:
                 userinfo = google.get('https://www.googleapis.com/oauth2/v3/userinfo').json()
+                email = userinfo['email']
+                return render_template('index.html', email=email)
             except:
                 return redirect(url_for('logout'))
 
-            email = userinfo['email']
-            return render_template('index.html', email=email)
+            return render_template('index.html')
         else:
             return render_template('index.html')
