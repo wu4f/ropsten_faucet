@@ -2,6 +2,6 @@
 {% block content %}
     <h3>Users</h3>
     {% for user in users %}
-    {{ user.last }} <a href="https://ropsten.etherscan.io/address/{{user.wallet}}">{{ user.name }}</a>:{{user.ip}}<br>
+    {{ user.last }} <a href="https://ropsten.etherscan.io/address/{{user.wallet}}">{{ user.name }}</a>:{{user.ip}} <font color=#ff0000>{{user.eth}}</font><br>
     {% endfor %}
 {% endblock %}

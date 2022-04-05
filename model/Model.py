@@ -12,27 +12,38 @@ class Model():
     def select_all(self):
         """
         Gets all rows from the database
-        Each row contains: email, last
-        :return: 0 if not in database, last value otherwise
+        :return: Rows of database
         """
         pass
 
-    def insert(self, email, ip, wallet):
+    def select_last_ip(self, number):
+        """
+        Gets recent requests from the database
+        :param: number of requests
+        :return: List of /16 IP prefixes for previous number of requests
+        """
+        pass
+
+    def insert(self, email, ip, wallet, eth):
         """
         Inserts entry into database
         :param email: String
         :param ip: String
         :param wallet: String
-        :return: none
+        :param eth: Real
+        :return: True
+        :raises: Database errors on connection and insertion
         """
         pass
 
-    def update(self, email, ip, wallet):
+    def update(self, email, ip, wallet, eth):
         """
         Updates entry in database
         :param email: String
         :param ip: String
         :param wallet: String
-        :return: none
+        :param eth: Real
+        :return: True
+        :raises: Database errors on connection and insertion
         """
         pass

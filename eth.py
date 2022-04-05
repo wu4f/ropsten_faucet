@@ -30,28 +30,32 @@ class Eth(MethodView):
         return ""
     
     def calculate_eth(self, email, ip, wallet, last):
-        send_amount = 5.0
-        now = datetime.now().astimezone(timezone(timedelta(hours=-8))).strftime('%m-%d %H:%M')
+        now = datetime.now().astimezone(timezone(timedelta(hours=-7))).strftime('%m-%d %H:%M')
+        delta = int(time.time()) - last
+        if delta < 1209600:
+            now = datetime.now().astimezone(timezone(timedelta(hours=-7))).strftime('%m-%d %H:%M')
+            logging.info(f'{now}:Rate Limit:{email}:{ip}:{wallet}:{delta}')
+            return 0.0
 
         if email.endswith('@pdx.edu'):
             logging.info(f'{now}:Eth Max:{email}:{ip}:{wallet}')
-            send_amount = 10.0
+            return 10.0
         
-        delta = int(time.time()) - last
-        if delta < 1209600:
-            now = datetime.now().astimezone(timezone(timedelta(hours=-8))).strftime('%m-%d %H:%M')
-            logging.info(f'{now}:Rate Limit:{email}:{ip}:{wallet}:{delta}')
-            send_amount = 0
+        m = model.get_model()
+        last_ips = m.select_last_ip(5)
+        if any([ip.startswith(substring) for substring in last_ips]):
+            logging.info(f'{now}:Eth Blocked Last:{email}:{ip}:{wallet}') 
+            return 0.0
 
-        return send_amount
+        return 5.0
 
     def send_eth(self, email, ip, to_address, send_amount):
         w3 = Web3(Web3.HTTPProvider(config.node_url))
         address1 = Web3.toChecksumAddress(config.faucet_address)
         address2 = Web3.toChecksumAddress(to_address)
         to_balance = w3.eth.get_balance(address2)
-        if to_balance > 10000000000000000000:
-            now = datetime.now().astimezone(timezone(timedelta(hours=-8))).strftime('%m-%d %H:%M')
+        if to_balance > 5000000000000000000:
+            now = datetime.now().astimezone(timezone(timedelta(hours=-7))).strftime('%m-%d %H:%M')
             logging.info(f'{now}:High Balance:{email}:{ip}:{to_address}')
             return 0
         nonce = w3.eth.getTransactionCount(address1)
@@ -64,12 +68,13 @@ class Eth(MethodView):
                 'maxPriorityFeePerGas': w3.toWei(500.0, 'gwei'),
                 'chainId': 3,
         }
+        now = datetime.now().astimezone(timezone(timedelta(hours=-7))).strftime('%m-%d %H:%M')
+        logging.info(f'{now}:Transaction attempt:{email}:{ip}:{to_address}')
         signed_tx = w3.eth.account.signTransaction(tx, config.faucet_key)
         try:
             tx_hash = w3.eth.sendRawTransaction(signed_tx.rawTransaction).hex()
         except:
-            now = datetime.now().astimezone(timezone(timedelta(hours=-8))).strftime('%m-%d %H:%M')
-            logging.info(f'{now}:Failed Transaction:{email}:{ip}:{to_address}')
+            logging.exception(f'{now}:Failed Transaction:{email}:{ip}:{to_address}')
             return 0
         return tx_hash
 
@@ -130,8 +135,8 @@ class Eth(MethodView):
 
         if tx_hash:
             if last == 0:
-                m.insert(email, ip, wallet)
+                m.insert(email, ip, wallet, send_amount)
             else:
-                m.update(email, ip, wallet)
+                m.update(email, ip, wallet, send_amount)
 
         return render_template('eth.html', email=email, tx_hash=tx_hash, wait=1)
