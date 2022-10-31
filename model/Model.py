@@ -35,15 +35,3 @@ class Model():
         :raises: Database errors on connection and insertion
         """
         pass
-
-    def update(self, email, ip, wallet, eth):
-        """
-        Updates entry in database
-        :param email: String
-        :param ip: String
-        :param wallet: String
-        :param eth: Real
-        :return: True
-        :raises: Database errors on connection and insertion
-        """
-        pass

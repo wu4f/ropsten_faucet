@@ -6,9 +6,17 @@ import model
 import config
 import time
 import logging
+import requests
 from datetime import datetime, timezone, timedelta
 
 class Eth(MethodView):
+    blockip = set()
+    blockemail = set()
+
+    def __init__(self):
+        self.blockip = { l.rstrip() for l in open('blockip.txt','r').readlines() }
+        self.blockemail = { l.rstrip() for l in open('blockemail.txt','r').readlines() }
+
     def validate_oauth(self, session):
         google = OAuth2Session(config.client_id, token=session['oauth_token'])
         try:
@@ -30,7 +38,17 @@ class Eth(MethodView):
         return ""
     
     def calculate_eth(self, email, ip, wallet, last):
+        def bad_ip(ip):
+            try:
+                resp = requests.get(f"http://check.getipintel.net/check.php?ip={ip}&contact=wuchang@pdx.edu&flags=f")
+                rating = float(resp.text)
+                return rating
+            except:
+                return 0
+            return 0
+
         now = datetime.now().astimezone(timezone(timedelta(hours=-7))).strftime('%m-%d %H:%M')
+
         delta = int(time.time()) - last
         if delta < 1209600:
             now = datetime.now().astimezone(timezone(timedelta(hours=-7))).strftime('%m-%d %H:%M')
@@ -41,13 +59,28 @@ class Eth(MethodView):
             logging.info(f'{now}:Eth Max:{email}:{ip}:{wallet}')
             return 10.0
         
+        if any([substring in email for substring in self.blockemail]):
+            logging.info(f'{now}:Eth Reduced Email:{email}:{ip}:{wallet}')
+            return 0.001
+
+        if any([ip.startswith(substring) for substring in self.blockip]):
+            logging.info(f'{now}:Eth Reduced IP:{email}:{ip}:{wallet}') 
+            return 0.001
+        else: 
+            rating = bad_ip(ip)
+            if rating > 0.95:
+                with open('blockip.txt','a+') as f:
+                    f.write(f'{ip}\n')
+                logging.info(f'{now}:Eth Reduced BadIP {rating}:{email}:{ip}:{wallet}') 
+                return 0.001
+
         m = model.get_model()
         last_ips = m.select_last_ip(5)
         if any([ip.startswith(substring) for substring in last_ips]):
             logging.info(f'{now}:Eth Blocked Last:{email}:{ip}:{wallet}') 
             return 0.0
 
-        return 5.0
+        return 1.0
 
     def send_eth(self, email, ip, to_address, send_amount):
         w3 = Web3(Web3.HTTPProvider(config.node_url))
@@ -64,18 +97,18 @@ class Eth(MethodView):
                 'to': address2,
                 'value': w3.toWei(send_amount, 'ether'),
                 'gas': 21000,
-                'maxFeePerGas': w3.toWei(1000.0, 'gwei'),
-                'maxPriorityFeePerGas': w3.toWei(500.0, 'gwei'),
+                'maxFeePerGas': w3.toWei(100.0, 'gwei'),
+                'maxPriorityFeePerGas': w3.toWei(50.0, 'gwei'),
                 'chainId': 3,
         }
         now = datetime.now().astimezone(timezone(timedelta(hours=-7))).strftime('%m-%d %H:%M')
-        logging.info(f'{now}:Transaction attempt:{email}:{ip}:{to_address}')
         signed_tx = w3.eth.account.signTransaction(tx, config.faucet_key)
         try:
             tx_hash = w3.eth.sendRawTransaction(signed_tx.rawTransaction).hex()
         except:
             logging.exception(f'{now}:Failed Transaction:{email}:{ip}:{to_address}')
             return 0
+        logging.info(f'{now}:Transaction attempt:{email}:{ip}:{to_address}:{tx_hash}')
         return tx_hash
 
     def get(self):
@@ -134,9 +167,6 @@ class Eth(MethodView):
             tx_hash = self.send_eth(email, ip, wallet, send_amount)
 
         if tx_hash:
-            if last == 0:
-                m.insert(email, ip, wallet, send_amount)
-            else:
-                m.update(email, ip, wallet, send_amount)
+            m.insert(email, ip, wallet, send_amount)
 
         return render_template('eth.html', email=email, tx_hash=tx_hash, wait=1)
